@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_bar_root" 
+              name="Bar Management" 
+              sequence="10"
+              web_icon="bar_reconciliation,static/description/icon.png"/>
+    
+    <menuitem id="menu_bar_reconciliation" 
+              name="Daily Reconciliation" 
+              parent="menu_bar_root" 
+              action="action_bar_reconciliation" 
+              sequence="10"/>
+    
+    <!-- Submenu for reports (optional) -->
+    <menuitem id="menu_bar_reports" 
+              name="Reports" 
+              parent="menu_bar_root" 
+              sequence="20"/>
+</odoo>

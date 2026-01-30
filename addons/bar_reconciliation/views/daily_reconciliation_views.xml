@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_bar_reconciliation_tree" model="ir.ui.view">
+        <field name="name">bar.reconciliation.tree</field>
+        <field name="model">bar.reconciliation</field>
+        <field name="arch" type="xml">
+            <tree string="Daily Reconciliations" decoration-success="state=='done'" 
+                  decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="expected_sales" sum="Total Expected"/>
+                <field name="total_received" sum="Total Received"/>
+                <field name="variance" sum="Total Variance"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_bar_reconciliation_form" model="ir.ui.view">
+        <field name="name">bar.reconciliation.form</field>
+        <field name="model">bar.reconciliation</field>
+        <field name="arch" type="xml">
+            <form string="Daily Reconciliation">
+                <header>
+                    <button name="action_load_products" string="Load Products" 
+                            type="object" class="oe_highlight" 
+                            invisible="state != 'draft'"/>
+                    <button name="action_complete" string="Complete Reconciliation" 
+                            type="object" class="oe_highlight" 
+                            invisible="state != 'draft'" 
+                            confirm="This will update stock quantities. Continue?"/>
+                    <button name="action_cancel" string="Cancel" 
+                            type="object" invisible="state != 'draft'"/>
+                    <button name="action_draft" string="Reset to Draft" 
+                            type="object" invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Stock Count" name="stock_count">
+                            <field name="stock_line_ids" readonly="state != 'draft'">
+                                <tree editable="bottom" create="1" delete="1">
+                                    <field name="product_id"/>
+                                    <field name="uom_id" optional="hide"/>
+                                    <field name="previous_qty"/>
+                                    <field name="counted_qty"/>
+                                    <field name="sold_qty"/>
+                                    <field name="unit_price"/>
+                                    <field name="sale_amount" sum="Total Sales"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Payment Reconciliation" name="payments">
+                            <group>
+                                <group string="Payments Received">
+                                    <field name="mpesa_amount" readonly="state != 'draft'"/>
+                                    <field name="cash_amount" readonly="state != 'draft'"/>
+                                    <field name="expenses" readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Calculation">
+                                    <field name="expected_sales" readonly="1" 
+                                           class="oe_subtotal_footer_separator"/>
+                                    <field name="total_received" readonly="1"/>
+                                    <field name="variance" readonly="1" 
+                                           class="oe_subtotal_footer_separator"
+                                           decoration-danger="variance &lt; -50"
+                                           decoration-warning="variance &lt; 0"
+                                           decoration-success="variance &gt;= 0"/>
+                                    <field name="variance_percentage" readonly="1" widget="percentage"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Summary" invisible="state != 'done'">
+                                <div class="alert alert-success" role="alert" 
+                                     invisible="variance &lt; -10 or variance &gt; 10">
+                                    <strong>✓ Perfect Match!</strong> Your reconciliation is accurate.
+                                </div>
+                                <div class="alert alert-warning" role="alert" 
+                                     invisible="variance &lt;= -10 or variance &gt;= 10">
+                                    <strong>⚠ Minor Variance</strong> Small discrepancy detected.
+                                </div>
+                                <div class="alert alert-danger" role="alert" 
+                                     invisible="variance &gt; -50">
+                                    <strong>⚠️ Shortage Detected!</strong> Significant shortage of 
+                                    <field name="variance" readonly="1" nolabel="1" class="fw-bold"/>
+                                </div>
+                                <div class="alert alert-info" role="alert" 
+                                     invisible="variance &lt; 50">
+                                    <strong>ℹ️ Excess Cash</strong> Extra 
+                                    <field name="variance" readonly="1" nolabel="1" class="fw-bold"/> received.
+                                </div>
+                            </group>
+                        </page>
+                        
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Add any notes about this reconciliation..." 
+                                   readonly="state != 'draft'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_bar_reconciliation" model="ir.actions.act_window">
+        <field name="name">Daily Reconciliation</field>
+        <field name="res_model">bar.reconciliation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first daily reconciliation
+            </p>
+            <p>
+                Count your stock, enter payments received, and let the system calculate variances.
+            </p>
+        </field>
+    </record>
+</odoo>

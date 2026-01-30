@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="sequence_bar_reconciliation" model="ir.sequence">
+            <field name="name">Bar Reconciliation</field>
+            <field name="code">bar.reconciliation</field>
+            <field name="prefix">REC/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+    </data>
+</odoo>
