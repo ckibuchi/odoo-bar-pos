@@ -1,0 +1,7 @@
+﻿backups/
+*.history/
+config/
+*.log
+__pycache__/
+*.pyc
+*.pyo
