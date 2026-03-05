@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Server action to open report wizard -->
+    <record id="action_stock_projected_revenue" model="ir.actions.act_window">
+        <field name="name">Projected Revenue</field>
+        <field name="res_model">stock.projected.revenue</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_stock_projected_revenue_tree" model="ir.ui.view">
+        <field name="name">stock.projected.revenue.tree</field>
+        <field name="model">stock.projected.revenue</field>
+        <field name="arch" type="xml">
+            <tree string="Stock Projected Revenue" create="false" edit="false" delete="false">
+                <field name="product_name" string="Product"/>
+                <field name="category_id" string="Category"/>
+                <field name="qty_on_hand" string="Qty on Hand"/>
+                <field name="cost_price" string="Cost Price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="sale_price" string="Sale Price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="total_cost_value" string="Total Cost Value" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total Cost"/>
+                <field name="projected_revenue" string="Projected Revenue" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total Projected Revenue"/>
+                <field name="potential_profit" string="Potential Profit" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total Potential Profit"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_stock_projected_revenue_pivot" model="ir.ui.view">
+        <field name="name">stock.projected.revenue.pivot</field>
+        <field name="model">stock.projected.revenue</field>
+        <field name="arch" type="xml">
+            <pivot string="Stock Projected Revenue">
+                <field name="category_id" type="row"/>
+                <field name="projected_revenue" type="measure"/>
+                <field name="total_cost_value" type="measure"/>
+                <field name="potential_profit" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Print buttons on tree view via action buttons -->
+    <record id="action_stock_projected_revenue_pdf" model="ir.actions.server">
+        <field name="name">Print PDF</field>
+        <field name="model_id" ref="model_stock_projected_revenue"/>
+        <field name="binding_model_id" ref="model_stock_projected_revenue"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = env.ref('stock_projected_revenue.action_report_stock_projected_revenue').report_action(records)
+        </field>
+    </record>
+
+    <record id="action_stock_projected_revenue_xlsx" model="ir.actions.server">
+        <field name="name">Export Excel</field>
+        <field name="model_id" ref="model_stock_projected_revenue"/>
+        <field name="binding_model_id" ref="model_stock_projected_revenue"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = env.ref('stock_projected_revenue.action_report_stock_projected_revenue_xlsx').report_action(records)
+        </field>
+    </record>
+
+    <!-- Menu item under Inventory > Reporting -->
+    <menuitem
+        id="menu_stock_projected_revenue"
+        name="Projected Revenue"
+        parent="stock.menu_warehouse_report"
+        action="action_stock_projected_revenue"
+        sequence="25"/>
+
+</odoo>
